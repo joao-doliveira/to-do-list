@@ -1,8 +1,14 @@
-import { LogInIcon } from "lucide-react";
-import { buttonVariants } from "./ui/button";
+"use client";
+
+import { ArrowUp, LogInIcon, LogOutIcon } from "lucide-react";
+import { Button, buttonVariants } from "./ui/button";
 import Link from "next/link";
+import { useClerk, useUser } from "@clerk/nextjs";
 
 const Navbar = () => {
+  const { signOut } = useClerk();
+  const { isSignedIn } = useUser();
+
   return (
     <div className="w-full px-5 md:px-8 py-4 bg-background flex justify-between">
       <Link href="/">
@@ -35,10 +41,32 @@ const Navbar = () => {
           />
         </svg>
       </Link>
-      <Link href="/login" className={buttonVariants({ variant: "default" })}>
-        <LogInIcon className="pr-2" />
-        Log in
-      </Link>
+      {isSignedIn ? (
+        <Button
+          onClick={() => signOut()}
+          className={buttonVariants({ variant: "default" })}
+        >
+          <LogOutIcon className="pr-2" />
+          Logout
+        </Button>
+      ) : (
+        <div className="flex flex-col gap-4 md:flex-row">
+          <Link
+            href="/signup"
+            className={buttonVariants({ variant: "defaultOutline" })}
+          >
+            <ArrowUp className="pr-2" />
+            Sign up
+          </Link>
+          <Link
+            href="/login"
+            className={buttonVariants({ variant: "default" })}
+          >
+            <LogInIcon className="pr-2" />
+            Log in
+          </Link>
+        </div>
+      )}
     </div>
   );
 };
