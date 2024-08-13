@@ -14,26 +14,48 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 export default function Page() {
   const { isLoaded, signUp, setActive } = useSignUp();
-  const [emailAddress, setEmailAddress] = React.useState("");
-  const [password, setPassword] = React.useState("");
   const [verifying, setVerifying] = React.useState(false);
+  const [passwordSubmitError, setPasswordSubmitError] = React.useState("");
   const [code, setCode] = React.useState("");
   const router = useRouter();
+  const { formState, register, handleSubmit, watch } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const { dirtyFields, errors } = formState;
+
+  const emailValue = watch("email");
+  const passwordValue = watch("password");
+
+  React.useEffect(() => {
+    if (passwordValue.length > 8) {
+      setPasswordSubmitError("");
+    } else if (dirtyFields.password) {
+      setPasswordSubmitError("Passwords must be 8 characters or more.");
+    }
+  }, [dirtyFields, passwordValue]);
+
+  const allRequiredFieldsTouched =
+    Boolean(dirtyFields.email) && Boolean(dirtyFields.password);
+
+  const disableSubmit = allRequiredFieldsTouched && !!passwordSubmitError;
 
   // Handle submission of the sign-up form
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const submit: SubmitHandler<FieldValues> = async (data) => {
     if (!isLoaded) return;
 
     // Start the sign-up process using the email and password provided
     try {
       await signUp.create({
-        emailAddress,
-        password,
+        emailAddress: data.email,
+        password: data.password,
       });
 
       // Send the user an email with the verification code
@@ -45,9 +67,10 @@ export default function Page() {
       // and capture the OTP code
       setVerifying(true);
     } catch (err: any) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2));
+      const error = JSON.parse(JSON.stringify(err)).errors[0];
+      if (error.meta.paramName === "password") {
+        setPasswordSubmitError(error.message);
+      }
     }
   };
 
@@ -106,7 +129,9 @@ export default function Page() {
               </InputOTPGroup>
             </InputOTP>
 
-            <Button type="submit" className="self-start">Verify</Button>
+            <Button type="submit" className="self-start">
+              Verify
+            </Button>
           </form>
         </Card>
       </div>
@@ -116,28 +141,61 @@ export default function Page() {
   // Display the initial sign-up form to capture the email and password
   return (
     <div className="w-full flex justify-center pt-5 md:pt-8">
-      <Card>
+      <Card className="min-w-[320px]">
         <H1>Sign up</H1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form
+          noValidate
+          onSubmit={handleSubmit(submit)}
+          className="flex flex-col gap-4"
+        >
           <div>
-            <Label htmlFor="email">Enter email address</Label>
+            <Label htmlFor="email">
+              Enter email address{" "}
+              {!Boolean(emailValue) && (
+                <span className="text-destructive">*</span>
+              )}
+            </Label>
             <Input
               id="email"
               type="email"
-              name="email"
-              value={emailAddress}
-              onChange={(e) => setEmailAddress(e.target.value)}
+              {...register("email", {
+                required: true,
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: "Please enter a valid email address.",
+                },
+              })}
             />
+            {errors.email && (
+              <p className="text-destructive text-sm mt-2">
+                {errors.email?.message}
+              </p>
+            )}
           </div>
           <div className="relative">
-            <Label htmlFor="password">Enter password</Label>
+            <Label htmlFor="password">
+              Enter password{" "}
+              {!Boolean(passwordValue) && (
+                <span className="text-destructive">*</span>
+              )}
+            </Label>
             <PasswordInput
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              passwordValue={passwordValue}
+              {...register("password")}
             />
+            {Boolean(passwordSubmitError) && (
+              <p className="text-destructive text-sm mt-2">
+                {passwordSubmitError}
+              </p>
+            )}
           </div>
+          {!allRequiredFieldsTouched && (
+            <p className="text-destructive text-sm">* required fields</p>
+          )}
           <div>
-            <Button type="submit">Next</Button>
+            <Button type="submit" disabled={disableSubmit}>
+              Sign up
+            </Button>
           </div>
         </form>
       </Card>

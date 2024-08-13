@@ -9,17 +9,39 @@ import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Input } from "@/components/ui/input";
 import Card from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 export default function SignInForm() {
   const { isLoaded, signIn, setActive } = useSignIn();
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  const [passwordSubmitError, setPasswordSubmitError] = React.useState("");
   const router = useRouter();
+  const { formState, register, handleSubmit, watch } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const { dirtyFields, errors } = formState;
+
+  const emailValue = watch("email");
+  const passwordValue = watch("password");
+
+  React.useEffect(() => {
+    if (passwordValue.length > 8) {
+      setPasswordSubmitError("");
+    } else if (dirtyFields.password) {
+      setPasswordSubmitError("Passwords must be 8 characters or more.");
+    }
+  }, [dirtyFields, passwordValue]);
+
+  const allRequiredFieldsTouched =
+    Boolean(dirtyFields.email) && Boolean(dirtyFields.password);
+
+  const disableSubmit = allRequiredFieldsTouched && !!passwordSubmitError;
 
   // Handle the submission of the sign-in form
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const submit: SubmitHandler<FieldValues> = async (data) => {
     if (!isLoaded) {
       return;
     }
@@ -27,11 +49,9 @@ export default function SignInForm() {
     // Start the sign-in process using the email and password provided
     try {
       const signInAttempt = await signIn.create({
-        identifier: email,
-        password,
+        identifier: data.email,
+        password: data.password,
       });
-
-      console.log(signInAttempt)
 
       // If sign-in process is complete, set the created session as active
       // and redirect the user
@@ -44,9 +64,10 @@ export default function SignInForm() {
         console.error(JSON.stringify(signInAttempt, null, 2));
       }
     } catch (err: any) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2));
+      const error = JSON.parse(JSON.stringify(err)).errors[0];
+      if (error.meta.paramName === "password") {
+        setPasswordSubmitError(error.message);
+      }
     }
   };
 
@@ -55,26 +76,56 @@ export default function SignInForm() {
     <div className="w-full flex justify-center pt-5 md:pt-8">
       <Card>
         <H1>Log in</H1>
-        <form onSubmit={(e) => handleSubmit(e)} className="flex flex-col gap-4">
+        <form noValidate onSubmit={handleSubmit(submit)} className="flex flex-col gap-4">
           <div>
-            <Label htmlFor="email">Enter email address</Label>
+            <Label htmlFor="email">
+              Enter email address{" "}
+              {!Boolean(emailValue) && (
+                <span className="text-destructive">*</span>
+              )}
+            </Label>
             <Input
-              onChange={(e) => setEmail(e.target.value)}
               id="email"
-              name="email"
               type="email"
-              value={email}
-              required
+              {...register("email", {
+                required: true,
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: "Please enter a valid email address.",
+                },
+              })}
             />
+            {errors.email && (
+              <p className="text-destructive text-sm mt-2">
+                {errors.email?.message}
+              </p>
+            )}
           </div>
-          <div>
-            <Label htmlFor="password">Enter password</Label>
+          <div className="relative">
+            <Label htmlFor="password">
+              Enter password{" "}
+              {!Boolean(passwordValue) && (
+                <span className="text-destructive">*</span>
+              )}
+            </Label>
             <PasswordInput
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              passwordValue={passwordValue}
+              {...register("password")}
             />
+            {Boolean(passwordSubmitError) && (
+              <p className="text-destructive text-sm mt-2">
+                {passwordSubmitError}
+              </p>
+            )}
           </div>
-          <Button type="submit" className="self-start">Sign in</Button>
+          {!allRequiredFieldsTouched && (
+            <p className="text-destructive text-sm">* required fields</p>
+          )}
+          <div>
+            <Button type="submit" disabled={disableSubmit}>
+              Log in
+            </Button>
+          </div>
         </form>
       </Card>
     </div>

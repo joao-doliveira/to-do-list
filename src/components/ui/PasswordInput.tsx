@@ -6,11 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input, InputProps } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, ...props }, ref) => {
+interface PasswordInputProps extends InputProps {
+  passwordValue: string;
+}
+
+const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
+  ({ className, passwordValue, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
     const disabled =
-      props.value === "" || props.value === undefined || props.disabled;
+      passwordValue === "" || passwordValue === undefined || props.disabled;
 
     return (
       <div className="relative">
