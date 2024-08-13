@@ -15,6 +15,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { ArrowUp } from "lucide-react";
 
 export default function Page() {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -193,7 +194,12 @@ export default function Page() {
             <p className="text-destructive text-sm">* required fields</p>
           )}
           <div>
-            <Button type="submit" disabled={disableSubmit}>
+            <Button
+              type="submit"
+              disabled={disableSubmit}
+              variant="defaultOutline"
+            >
+              <ArrowUp className="pr-2" />
               Sign up
             </Button>
           </div>

@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import Card from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { LogInIcon } from "lucide-react";
 
 export default function SignInForm() {
   const { isLoaded, signIn, setActive } = useSignIn();
@@ -76,7 +77,11 @@ export default function SignInForm() {
     <div className="w-full flex justify-center pt-5 md:pt-8">
       <Card>
         <H1>Log in</H1>
-        <form noValidate onSubmit={handleSubmit(submit)} className="flex flex-col gap-4">
+        <form
+          noValidate
+          onSubmit={handleSubmit(submit)}
+          className="flex flex-col gap-4"
+        >
           <div>
             <Label htmlFor="email">
               Enter email address{" "}
@@ -123,6 +128,7 @@ export default function SignInForm() {
           )}
           <div>
             <Button type="submit" disabled={disableSubmit}>
+              <LogInIcon className="pr-2" />
               Log in
             </Button>
           </div>
