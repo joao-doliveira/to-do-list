@@ -19,9 +19,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${inter.className} w-full`}>
+        <body className={`${inter.className} w-full bg-slate-100`}>
+        <Navbar />
           <div className="max-w-7xl m-auto">
-            <Navbar />
             {children}
           </div>
         </body>
