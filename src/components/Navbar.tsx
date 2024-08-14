@@ -45,7 +45,7 @@ const Navbar = () => {
         {isSignedIn ? (
           <Button
             onClick={() => signOut()}
-            className={buttonVariants({ variant: "default" })}
+            className={buttonVariants({ variant: "defaultOutline" })}
           >
             <LogOutIcon className="pr-2" />
             Logout
