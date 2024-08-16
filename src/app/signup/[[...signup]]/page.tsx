@@ -26,6 +26,8 @@ export default function Page() {
   const { formState, register, handleSubmit, watch } = useForm({
     defaultValues: {
       email: "",
+      firstName: "",
+      lastName: "",
       password: "",
     },
   });
@@ -33,6 +35,8 @@ export default function Page() {
   const { dirtyFields, errors } = formState;
 
   const emailValue = watch("email");
+  const firstNameValue = watch("firstName");
+  const lastNameValue = watch("lastName");
   const passwordValue = watch("password");
 
   React.useEffect(() => {
@@ -44,9 +48,13 @@ export default function Page() {
   }, [dirtyFields, passwordValue]);
 
   const allRequiredFieldsTouched =
-    Boolean(dirtyFields.email) && Boolean(dirtyFields.password);
+    Boolean(dirtyFields.email) &&
+    Boolean(dirtyFields.password) &&
+    Boolean(dirtyFields.firstName) &&
+    Boolean(dirtyFields.lastName);
 
-  const disableSubmit = allRequiredFieldsTouched && !!passwordSubmitError;
+  const disableSubmit =
+    !allRequiredFieldsTouched || Boolean(passwordSubmitError);
 
   // Handle submission of the sign-up form
   const submit: SubmitHandler<FieldValues> = async (data) => {
@@ -56,6 +64,8 @@ export default function Page() {
     try {
       await signUp.create({
         emailAddress: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
         password: data.password,
       });
 
@@ -149,6 +159,36 @@ export default function Page() {
           onSubmit={handleSubmit(submit)}
           className="flex flex-col gap-4"
         >
+          <div>
+            <Label htmlFor="firstName">
+              First name{" "}
+              {!Boolean(firstNameValue) && (
+                <span className="text-destructive">*</span>
+              )}
+            </Label>
+            <Input
+              id="firstName"
+              type="text"
+              {...register("firstName", {
+                required: true,
+              })}
+            />
+          </div>
+          <div>
+            <Label htmlFor="lastName">
+              Last name{" "}
+              {!Boolean(lastNameValue) && (
+                <span className="text-destructive">*</span>
+              )}
+            </Label>
+            <Input
+              id="lastName"
+              type="text"
+              {...register("lastName", {
+                required: true,
+              })}
+            />
+          </div>
           <div>
             <Label htmlFor="email">
               Enter email address{" "}
