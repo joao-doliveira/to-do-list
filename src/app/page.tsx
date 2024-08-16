@@ -1,6 +1,6 @@
 "use client";
 
-import CreateToDoButton from "@/components/CreateToDoButton";
+import CreateToDo from "@/components/CreateToDo";
 import NotebookIllustration from "@/components/illustrations/NotebookIllustration";
 import { buttonVariants } from "@/components/ui/button";
 import { H1 } from "@/components/ui/H1";
@@ -15,7 +15,7 @@ export default function Home() {
       {isSignedIn ? (
         <div className="w-full flex flex-col gap-5 md:flex-row md:justify-between">
           <H1>Keeping up with your to dos!</H1>
-          <CreateToDoButton />
+          <CreateToDo />
         </div>
       ) : (
         <div className="w-full max-w-[480px] flex flex-col items-center gap-8 md:gap-16">
