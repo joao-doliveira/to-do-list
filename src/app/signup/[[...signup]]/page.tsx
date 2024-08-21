@@ -43,7 +43,7 @@ export default function Page() {
     if (passwordValue.length > 8) {
       setPasswordSubmitError("");
     } else if (dirtyFields.password) {
-      setPasswordSubmitError("Passwords must be 8 characters or more.");
+      setPasswordSubmitError("Passwords must be 9 characters or more.");
     }
   }, [dirtyFields, passwordValue]);
 
