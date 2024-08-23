@@ -1,13 +1,13 @@
 "use client";
 
-import { ArrowUp, LogInIcon, LogOutIcon } from "lucide-react";
+import { ArrowUp, CircleUserRound, LogInIcon, LogOutIcon } from "lucide-react";
 import { Button, buttonVariants } from "./ui/button";
 import Link from "next/link";
 import { useClerk, useUser } from "@clerk/nextjs";
 
 const Navbar = () => {
   const { signOut } = useClerk();
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
 
   return (
     <nav className="w-full bg-background">
@@ -43,15 +43,21 @@ const Navbar = () => {
           </svg>
         </Link>
         {isSignedIn ? (
-          <Button
-            onClick={() => signOut()}
-            className={buttonVariants({ variant: "defaultOutline" })}
-          >
-            <LogOutIcon className="pr-2" />
-            Logout
-          </Button>
+          <div className="flex flex-col justify-end md:flex-row-reverse gap-2 ">
+            <Button
+              onClick={() => signOut()}
+              className={buttonVariants({ variant: "defaultOutline" })}
+            >
+              <LogOutIcon className="pr-2" />
+              Logout
+            </Button>
+            <div className="flex gap-1 font-semibold text-primary self-end md:self-center">
+              <p>{user.firstName}</p>
+              <CircleUserRound />
+            </div>
+          </div>
         ) : (
-          <div className="flex flex-col gap-4 md:flex-row">
+          <div className="hidden md:flex md:flex-row gap-4">
             <Link
               href="/signup"
               className={buttonVariants({ variant: "defaultOutline" })}
