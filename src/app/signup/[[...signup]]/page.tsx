@@ -16,21 +16,28 @@ import {
 } from "@/components/ui/input-otp";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { ArrowUp } from "lucide-react";
+import { createUser } from "./actions";
+import { CreateClerkUser, CreateClerkUserSchema, CreateUser } from "@/lib/validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function Page() {
   const { isLoaded, signUp, setActive } = useSignUp();
   const [verifying, setVerifying] = React.useState(false);
   const [passwordSubmitError, setPasswordSubmitError] = React.useState("");
   const [code, setCode] = React.useState("");
-  const router = useRouter();
-  const { formState, register, handleSubmit, watch } = useForm({
-    defaultValues: {
-      email: "",
-      firstName: "",
-      lastName: "",
-      password: "",
-    },
+  const defaultValues = {
+    email: "",
+    firstName: "",
+    lastName: "",
+  };
+  const form = useForm<CreateClerkUser>({
+    resolver: zodResolver(CreateClerkUserSchema),
+    defaultValues: { ...defaultValues, password: "" }
   });
+  const { formState, register, handleSubmit, watch } = form;
+  const [formSubmittedData, setFormSubmittedData] =
+    React.useState<CreateUser | null>(null);
+  const router = useRouter();
 
   const { dirtyFields, errors } = formState;
 
@@ -60,6 +67,13 @@ export default function Page() {
   const submit: SubmitHandler<FieldValues> = async (data) => {
     if (!isLoaded) return;
 
+    const userData: CreateUser = {
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      fullName: `${data.firstName} ${data.lastName}`,
+    };
+
     // Start the sign-up process using the email and password provided
     try {
       await signUp.create({
@@ -68,6 +82,8 @@ export default function Page() {
         lastName: data.lastName,
         password: data.password,
       });
+
+      setFormSubmittedData(userData);
 
       // Send the user an email with the verification code
       await signUp.prepareEmailAddressVerification({
@@ -101,6 +117,9 @@ export default function Page() {
       // and redirect the user
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
+
+        if (formSubmittedData) await createUser(formSubmittedData);
+        setFormSubmittedData(null);
         router.push("/");
       } else {
         // If the status is not complete, check why. User may need to
