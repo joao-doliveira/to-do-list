@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, PlusIcon } from "lucide-react";
@@ -37,12 +38,14 @@ import {
   CreateToDoFormValues,
   CreateToDoFormValuesSchema,
 } from "@/lib/validation";
+import { toast } from "./ui/use-toast";
 
 interface CreateToDoFormProps {
   userId: string;
 }
 
 export function CreateToDoForm({ userId }: CreateToDoFormProps) {
+  const [open, setOpen] = React.useState(false);
   const form = useForm<CreateToDoFormValues>({
     resolver: zodResolver(CreateToDoFormValuesSchema),
     defaultValues: {
@@ -65,11 +68,29 @@ export function CreateToDoForm({ userId }: CreateToDoFormProps) {
     !Boolean(dirtyFields.deadline);
 
   async function onSubmit(data: CreateToDoFormValues) {
-    await createToDo({ formData: data, ownerId: userId });
+
+    try {
+      await createToDo({ formData: data, ownerId: userId }).then(() => {
+        setOpen(false);
+        toast({
+          title: "To do created!",
+          description: "Your to do was successfully created!",
+          variant: "default",
+        });
+      }); 
+    } catch (error) {
+      const err = new Error(JSON.stringify(error))
+      console.log("err: ", err)
+      toast({
+        title: "Failed to create to do",
+        description: err.message,
+        variant: "destructive",
+      });
+    }
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="self-start">
           <PlusIcon className="pr-2" />
