@@ -9,6 +9,7 @@ export const UserSchema = z.object({
 export type User = z.output<typeof UserSchema>;
 
 export const CreateUserSchema = z.object({
+  id: z.string(),
   fullName: z.string(),
 }).and(UserSchema)
 
@@ -20,10 +21,19 @@ export const CreateClerkUserSchema = z.object({
 
 export type CreateClerkUser = z.output<typeof CreateClerkUserSchema>;
 
-export const CreateToDoSchema = z.object({
-  title: z.string(),
-  description: z.string(),
-  deadline: z.string(),
+export const CreateToDoFormValuesSchema = z.object({
+  deadline: z.date(),
+  description: z.string().min(1),
+  title: z.string().min(1),
 });
 
-export type CreateToDo = z.infer<typeof CreateToDoSchema>;
+export type CreateToDoFormValues = z.infer<typeof CreateToDoFormValuesSchema>;
+
+export const ToDoSchema = z.object({
+  ownerId: z.string().uuid(),
+}).and(CreateToDoFormValuesSchema);
+
+export type ToDo = z.infer<typeof ToDoSchema>;
+
+
+

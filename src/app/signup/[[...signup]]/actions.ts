@@ -3,13 +3,14 @@
 import prisma from "../../../../db";
 import { type CreateUser } from "@/lib/validation";
 
-export async function createUser(formData: CreateUser) {
+export async function createUser(createUserData: CreateUser) {
   await prisma.user.create({
     data: {
-      email: formData.email,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      fullName: `${formData.firstName} ${formData.lastName}`,
+      id: createUserData.id,
+      email: createUserData.email,
+      firstName: createUserData.firstName,
+      lastName: createUserData.lastName,
+      fullName: `${createUserData.firstName} ${createUserData.lastName}`,
     },
   });
 }

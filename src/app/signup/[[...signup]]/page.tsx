@@ -17,7 +17,11 @@ import {
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { ArrowUp } from "lucide-react";
 import { createUser } from "./actions";
-import { CreateClerkUser, CreateClerkUserSchema, CreateUser } from "@/lib/validation";
+import {
+  CreateClerkUser,
+  CreateClerkUserSchema,
+  CreateUser,
+} from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function Page() {
@@ -32,11 +36,13 @@ export default function Page() {
   };
   const form = useForm<CreateClerkUser>({
     resolver: zodResolver(CreateClerkUserSchema),
-    defaultValues: { ...defaultValues, password: "" }
+    defaultValues: { ...defaultValues, password: "" },
   });
   const { formState, register, handleSubmit, watch } = form;
-  const [formSubmittedData, setFormSubmittedData] =
-    React.useState<CreateUser | null>(null);
+  const [formSubmittedData, setFormSubmittedData] = React.useState<Omit<
+    CreateUser,
+    "id"
+  > | null>(null);
   const router = useRouter();
 
   const { dirtyFields, errors } = formState;
@@ -67,7 +73,7 @@ export default function Page() {
   const submit: SubmitHandler<FieldValues> = async (data) => {
     if (!isLoaded) return;
 
-    const userData: CreateUser = {
+    const userData: Omit<CreateUser, "id"> = {
       email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
@@ -118,7 +124,13 @@ export default function Page() {
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
 
-        if (formSubmittedData) await createUser(formSubmittedData);
+        if (formSubmittedData && signUp.createdUserId) {
+          const createUserData: CreateUser = {
+            ...formSubmittedData,
+            id: signUp.createdUserId,
+          };
+          await createUser(createUserData);
+        }
         setFormSubmittedData(null);
         router.push("/");
       } else {
