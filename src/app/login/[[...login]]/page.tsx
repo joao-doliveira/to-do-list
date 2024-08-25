@@ -4,43 +4,54 @@ import * as React from "react";
 import { useSignIn } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { H1 } from "@/components/ui/H1";
-import { Label } from "@/components/ui/label";
-import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Input } from "@/components/ui/input";
 import Card from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { LogInIcon } from "lucide-react";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { LogInValues, LogInValuesSchema } from "@/lib/validation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { PasswordFormField } from "@/components/ui/PasswordFormField";
+import { toast } from "@/components/ui/use-toast";
 
 export default function SignInForm() {
   const { isLoaded, signIn, setActive } = useSignIn();
   const [passwordSubmitError, setPasswordSubmitError] = React.useState("");
   const router = useRouter();
-  const { formState, register, handleSubmit, watch } = useForm({
+  const form = useForm<LogInValues>({
+    resolver: zodResolver(LogInValuesSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const { dirtyFields, errors } = formState;
+  const { formState, handleSubmit, watch } = form;
+
+  const { dirtyFields } = formState;
 
   const emailValue = watch("email");
   const passwordValue = watch("password");
 
   React.useEffect(() => {
-    if (passwordValue.length > 8) {
+    if (passwordValue.length >= 8) {
       setPasswordSubmitError("");
     } else if (dirtyFields.password) {
-      setPasswordSubmitError("Passwords must be 9 characters or more.");
+      setPasswordSubmitError("Passwords must be 8 characters or more.");
     }
   }, [dirtyFields, passwordValue]);
 
-  const allRequiredFieldsTouched =
-    Boolean(dirtyFields.email) && Boolean(dirtyFields.password);
-
   const disableSubmit =
-    !allRequiredFieldsTouched || Boolean(passwordSubmitError);
+  !Boolean(dirtyFields.email) ||
+  !Boolean(dirtyFields.password) ||
+  Boolean(passwordSubmitError);
 
   // Handle the submission of the sign-in form
   const submit: SubmitHandler<FieldValues> = async (data) => {
@@ -70,6 +81,12 @@ export default function SignInForm() {
       if (error.meta.paramName === "password") {
         setPasswordSubmitError(error.message);
       }
+
+      toast({
+        title: "Log in failed",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -78,62 +95,48 @@ export default function SignInForm() {
     <div className="w-full flex justify-center pt-5 md:pt-8">
       <Card>
         <H1>Log in</H1>
-        <form
-          noValidate
-          onSubmit={handleSubmit(submit)}
-          className="flex flex-col gap-4"
-        >
-          <div>
-            <Label htmlFor="email">
-              Enter email address{" "}
-              {!Boolean(emailValue) && (
-                <span className="text-destructive">*</span>
+        <Form {...form}>
+          <form
+            noValidate
+            onSubmit={handleSubmit(submit)}
+            className="flex flex-col gap-4"
+          >
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>
+                    Enter email address{" "}
+                    {!Boolean(emailValue) && (
+                      <span className="text-destructive">*</span>
+                    )}
+                  </FormLabel>
+                  <Input {...field} />
+                  <FormMessage />
+                </FormItem>
               )}
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              {...register("email", {
-                required: true,
-                pattern: {
-                  value: /^\S+@\S+$/i,
-                  message: "Please enter a valid email address.",
-                },
-              })}
             />
-            {errors.email && (
-              <p className="text-destructive text-sm mt-2">
-                {errors.email?.message}
-              </p>
-            )}
-          </div>
-          <div className="relative">
-            <Label htmlFor="password">
-              Enter password{" "}
-              {!Boolean(passwordValue) && (
-                <span className="text-destructive">*</span>
-              )}
-            </Label>
-            <PasswordInput
-              passwordValue={passwordValue}
-              {...register("password")}
-            />
-            {Boolean(passwordSubmitError) && (
-              <p className="text-destructive text-sm mt-2">
-                {passwordSubmitError}
-              </p>
-            )}
-          </div>
-          {!allRequiredFieldsTouched && (
-            <p className="text-destructive text-sm">* required fields</p>
-          )}
-          <div>
-            <Button type="submit" disabled={disableSubmit}>
-              <LogInIcon className="pr-2" />
-              Log in
-            </Button>
-          </div>
-        </form>
+
+            <PasswordFormField required={!Boolean(passwordValue)} />
+            {disableSubmit &&
+              (Boolean(passwordSubmitError) ? (
+                <p className="text-destructive text-sm font-medium">
+                  {passwordSubmitError}
+                </p>
+              ) : (
+                <p className="text-destructive text-sm font-medium">
+                  * required fields
+                </p>
+              ))}
+            <div>
+              <Button type="submit" disabled={disableSubmit}>
+                <LogInIcon className="pr-2" />
+                Log in
+              </Button>
+            </div>
+          </form>
+        </Form>
       </Card>
     </div>
   );
