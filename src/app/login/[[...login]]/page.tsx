@@ -32,14 +32,15 @@ export default function SignInForm() {
     if (passwordValue.length > 8) {
       setPasswordSubmitError("");
     } else if (dirtyFields.password) {
-      setPasswordSubmitError("Passwords must be 8 characters or more.");
+      setPasswordSubmitError("Passwords must be 9 characters or more.");
     }
   }, [dirtyFields, passwordValue]);
 
   const allRequiredFieldsTouched =
     Boolean(dirtyFields.email) && Boolean(dirtyFields.password);
 
-  const disableSubmit = allRequiredFieldsTouched && !!passwordSubmitError;
+  const disableSubmit =
+    !allRequiredFieldsTouched || Boolean(passwordSubmitError);
 
   // Handle the submission of the sign-in form
   const submit: SubmitHandler<FieldValues> = async (data) => {
