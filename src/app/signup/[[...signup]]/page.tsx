@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { H1 } from "@/components/ui/H1";
 import Card from "@/components/ui/Card";
-import { PasswordInput } from "@/components/ui/PasswordInput";
 import {
   InputOTP,
   InputOTPGroup,
@@ -23,6 +22,14 @@ import {
   CreateUser,
 } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { PasswordFormField } from "@/components/ui/PasswordFormField";
 
 export default function Page() {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -38,14 +45,14 @@ export default function Page() {
     resolver: zodResolver(CreateClerkUserSchema),
     defaultValues: { ...defaultValues, password: "" },
   });
-  const { formState, register, handleSubmit, watch } = form;
+  const { formState, handleSubmit, watch } = form;
   const [formSubmittedData, setFormSubmittedData] = React.useState<Omit<
     CreateUser,
     "id"
   > | null>(null);
   const router = useRouter();
 
-  const { dirtyFields, errors } = formState;
+  const { dirtyFields } = formState;
 
   const emailValue = watch("email");
   const firstNameValue = watch("firstName");
@@ -53,21 +60,19 @@ export default function Page() {
   const passwordValue = watch("password");
 
   React.useEffect(() => {
-    if (passwordValue.length > 8) {
+    if (passwordValue.length >= 8) {
       setPasswordSubmitError("");
     } else if (dirtyFields.password) {
-      setPasswordSubmitError("Passwords must be 9 characters or more.");
+      setPasswordSubmitError("Passwords must be 8 characters or more.");
     }
   }, [dirtyFields, passwordValue]);
 
-  const allRequiredFieldsTouched =
-    Boolean(dirtyFields.email) &&
-    Boolean(dirtyFields.password) &&
-    Boolean(dirtyFields.firstName) &&
-    Boolean(dirtyFields.lastName);
-
   const disableSubmit =
-    !allRequiredFieldsTouched || Boolean(passwordSubmitError);
+    !Boolean(dirtyFields.email) ||
+    !Boolean(dirtyFields.password) ||
+    !Boolean(dirtyFields.firstName) ||
+    !Boolean(dirtyFields.lastName) ||
+    Boolean(passwordSubmitError);
 
   // Handle submission of the sign-up form
   const submit: SubmitHandler<FieldValues> = async (data) => {
@@ -185,96 +190,84 @@ export default function Page() {
     <div className="w-full flex justify-center pt-5 md:pt-8">
       <Card className="min-w-[320px]">
         <H1>Sign up</H1>
-        <form
-          noValidate
-          onSubmit={handleSubmit(submit)}
-          className="flex flex-col gap-4"
-        >
-          <div>
-            <Label htmlFor="firstName">
-              First name{" "}
-              {!Boolean(firstNameValue) && (
-                <span className="text-destructive">*</span>
+        <Form {...form}>
+          <form
+            noValidate
+            onSubmit={handleSubmit(submit)}
+            className="flex flex-col gap-4"
+          >
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>
+                    First name{" "}
+                    {!Boolean(firstNameValue) && (
+                      <span className="text-destructive">*</span>
+                    )}
+                  </FormLabel>
+                  <Input {...field} />
+                  <FormMessage />
+                </FormItem>
               )}
-            </Label>
-            <Input
-              id="firstName"
-              type="text"
-              {...register("firstName", {
-                required: true,
-              })}
             />
-          </div>
-          <div>
-            <Label htmlFor="lastName">
-              Last name{" "}
-              {!Boolean(lastNameValue) && (
-                <span className="text-destructive">*</span>
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>
+                    Last name{" "}
+                    {!Boolean(lastNameValue) && (
+                      <span className="text-destructive">*</span>
+                    )}
+                  </FormLabel>
+                  <Input {...field} />
+                  <FormMessage />
+                </FormItem>
               )}
-            </Label>
-            <Input
-              id="lastName"
-              type="text"
-              {...register("lastName", {
-                required: true,
-              })}
             />
-          </div>
-          <div>
-            <Label htmlFor="email">
-              Enter email address{" "}
-              {!Boolean(emailValue) && (
-                <span className="text-destructive">*</span>
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>
+                    Enter email address{" "}
+                    {!Boolean(emailValue) && (
+                      <span className="text-destructive">*</span>
+                    )}
+                  </FormLabel>
+                  <Input {...field} />
+                  <FormMessage />
+                </FormItem>
               )}
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              {...register("email", {
-                required: true,
-                pattern: {
-                  value: /^\S+@\S+$/i,
-                  message: "Please enter a valid email address.",
-                },
-              })}
             />
-            {errors.email && (
-              <p className="text-destructive text-sm mt-2">
-                {errors.email?.message}
-              </p>
-            )}
-          </div>
-          <div className="relative">
-            <Label htmlFor="password">
-              Enter password{" "}
-              {!Boolean(passwordValue) && (
-                <span className="text-destructive">*</span>
-              )}
-            </Label>
-            <PasswordInput
-              passwordValue={passwordValue}
-              {...register("password")}
-            />
-            {Boolean(passwordSubmitError) && (
-              <p className="text-destructive text-sm mt-2">
-                {passwordSubmitError}
-              </p>
-            )}
-          </div>
-          {!allRequiredFieldsTouched && (
-            <p className="text-destructive text-sm">* required fields</p>
-          )}
-          <div>
-            <Button
-              type="submit"
-              disabled={disableSubmit}
-              variant="defaultOutline"
-            >
-              <ArrowUp className="pr-2" />
-              Sign up
-            </Button>
-          </div>
-        </form>
+            <PasswordFormField required={!Boolean(passwordValue)} />
+            {disableSubmit &&
+              (Boolean(passwordSubmitError) ? (
+                <p className="text-destructive text-sm font-medium">
+                  {passwordSubmitError}
+                </p>
+              ) : (
+                <p className="text-destructive text-sm font-medium">
+                  * required fields
+                </p>
+              ))}
+            <div>
+              <Button
+                type="submit"
+                disabled={disableSubmit}
+                variant="defaultOutline"
+              >
+                <ArrowUp className="pr-2" />
+                Sign up
+              </Button>
+            </div>
+          </form>
+        </Form>
       </Card>
     </div>
   );

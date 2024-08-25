@@ -1,7 +1,9 @@
 import { z } from "zod";
 
 export const UserSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email({
+    message: "Please enter an email address with proper format."
+  }),
   firstName: z.string(),
   lastName: z.string(),
 });
@@ -16,7 +18,9 @@ export const CreateUserSchema = z.object({
 export type CreateUser = z.output<typeof CreateUserSchema>;
 
 export const CreateClerkUserSchema = z.object({
-  password: z.string(),
+  password: z.string().min(8, {
+    message: "Passwords must be 8 characters or more."
+  }),
 }).and(UserSchema)
 
 export type CreateClerkUser = z.output<typeof CreateClerkUserSchema>;
