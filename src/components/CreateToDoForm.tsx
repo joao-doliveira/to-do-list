@@ -7,38 +7,34 @@ import { CalendarIcon, PlusIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
+  Button,
+  Calendar,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import {
+  Input,
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Input } from "./ui/input";
-import { Textarea } from "./ui/textarea";
-import {
+  Textarea,
   Dialog,
   DialogTrigger,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog";
+  toast,
+} from "@/components/shadcn";
 import { Title } from "./ui/Title";
 import { createToDo } from "@/app/actions";
 import {
   CreateToDoFormValues,
   CreateToDoFormValuesSchema,
 } from "@/lib/validation";
-import { toast } from "./ui/use-toast";
 
 interface CreateToDoFormProps {
   userId: string;
@@ -68,7 +64,6 @@ export function CreateToDoForm({ userId }: CreateToDoFormProps) {
     !Boolean(dirtyFields.deadline);
 
   async function onSubmit(data: CreateToDoFormValues) {
-
     try {
       await createToDo({ formData: data, ownerId: userId }).then(() => {
         setOpen(false);
@@ -77,10 +72,9 @@ export function CreateToDoForm({ userId }: CreateToDoFormProps) {
           description: "Your to do was successfully created!",
           variant: "default",
         });
-      }); 
+      });
     } catch (error) {
-      const err = new Error(JSON.stringify(error))
-      console.log("err: ", err)
+      const err = new Error(JSON.stringify(error));
       toast({
         title: "Failed to create to do",
         description: err.message,

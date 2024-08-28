@@ -1,3 +1,5 @@
+"use client"
+
 import { EyeOffIcon, EyeIcon } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 import {
@@ -6,8 +8,8 @@ import {
   FormControl,
   FormDescription,
   FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+  Input,
+} from "@/components/shadcn";
 import { createElement, useState } from "react";
 
 type PasswordFormFieldProps = {

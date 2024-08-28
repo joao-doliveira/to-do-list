@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowUp, CircleUserRound, LogInIcon, LogOutIcon } from "lucide-react";
-import { Button, buttonVariants } from "./ui/button";
+import { Button, buttonVariants } from "./shadcn";
 import Link from "next/link";
 import { useClerk, useUser } from "@clerk/nextjs";
 
