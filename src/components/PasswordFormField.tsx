@@ -6,8 +6,8 @@ import {
   FormControl,
   FormDescription,
   FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+  Input,
+} from "@/components/shadcn";
 import { createElement, useState } from "react";
 
 type PasswordFormFieldProps = {

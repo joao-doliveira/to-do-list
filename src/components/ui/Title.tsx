@@ -11,7 +11,7 @@ export interface TitleProps
 const Title = React.forwardRef<HTMLInputElement, TitleProps>(
   ({ className, children, ...props }, ref) => {
     return (
-      <span
+      <p
         className={cn(
           `${oswald.className} scroll-m-20 text-xl font-extrabold tracking-tight lg:text-3xl`,
           className
@@ -20,7 +20,7 @@ const Title = React.forwardRef<HTMLInputElement, TitleProps>(
         {...props}
       >
         {children}
-      </span>
+      </p>
     );
   }
 );

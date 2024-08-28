@@ -3,16 +3,21 @@
 import * as React from "react";
 import { useSignUp } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { H1 } from "@/components/ui/H1";
-import Card from "@/components/ui/Card";
 import {
+  Button,
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from "@/components/ui/input-otp";
+  Label,
+} from "@/components/shadcn";
+import { H1 } from "@/components/ui/H1";
+import Card from "@/components/ui/Card";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { ArrowUp } from "lucide-react";
 import { createUser } from "./actions";
@@ -22,14 +27,7 @@ import {
   CreateUser,
 } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { PasswordFormField } from "@/components/ui/PasswordFormField";
+import { PasswordFormField } from "@/components/PasswordFormField";
 
 export default function Page() {
   const { isLoaded, signUp, setActive } = useSignUp();

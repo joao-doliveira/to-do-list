@@ -2,7 +2,7 @@
 
 import { CreateToDoForm } from "@/components/CreateToDoForm";
 import NotebookIllustration from "@/components/illustrations/NotebookIllustration";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/shadcn";
 import { H1 } from "@/components/ui/H1";
 import { useUser } from "@clerk/nextjs";
 import { ArrowUp, LogInIcon } from "lucide-react";
