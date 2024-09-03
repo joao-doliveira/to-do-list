@@ -185,7 +185,7 @@ export default function Page() {
 
   // Display the initial sign-up form to capture the email and password
   return (
-    <div className="w-full flex justify-center pt-5 md:pt-8">
+    <section className="w-full flex justify-center pt-5 md:pt-8">
       <Card className="min-w-[320px]">
         <H1>Sign up</H1>
         <Form {...form}>
@@ -267,6 +267,6 @@ export default function Page() {
           </form>
         </Form>
       </Card>
-    </div>
+    </section>
   );
 }

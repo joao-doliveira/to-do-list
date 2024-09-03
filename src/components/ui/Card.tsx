@@ -10,7 +10,7 @@ const Card = ({ children, className }: CardProps) => {
   return (
     <div
       className={cn(
-        "flex flex-col gap-4 p-6 border rounded-2xl border-slate-400 bg-background",
+        "flex flex-col gap-4 p-6  rounded-2xl  bg-background shadow-md",
         className
       )}
     >

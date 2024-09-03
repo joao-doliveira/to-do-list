@@ -2,6 +2,7 @@
 
 import { CreateToDoFormValues } from "@/lib/validation";
 import prisma from "../../db";
+import { revalidateTag } from "next/cache";
 
 interface CreateToDoProps {
   formData: CreateToDoFormValues;
@@ -19,4 +20,18 @@ export async function createToDo({ formData, ownerId }: CreateToDoProps) {
       ownerId,
     },
   });
+
+  revalidateTag("todos");
+}
+
+
+export async function deleteToDo(toDoId: string) {
+
+  await prisma.todo.delete({
+    where: {
+      id: toDoId
+    }
+  });
+
+  revalidateTag("todos");
 }
