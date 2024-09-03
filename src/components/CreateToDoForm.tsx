@@ -53,6 +53,7 @@ export function CreateToDoForm({ userId }: CreateToDoFormProps) {
 
   const watch = form.watch;
   const dirtyFields = form.formState.dirtyFields;
+  const reset = form.reset;
 
   const titleValue = watch("title");
   const descriptionValue = watch("description");
@@ -72,6 +73,7 @@ export function CreateToDoForm({ userId }: CreateToDoFormProps) {
           description: "Your to do was successfully created!",
           variant: "default",
         });
+        reset();
       });
     } catch (error) {
       const err = new Error(JSON.stringify(error));

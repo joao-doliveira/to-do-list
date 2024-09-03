@@ -1,24 +1,26 @@
-"use client";
-
 import { CreateToDoForm } from "@/components/CreateToDoForm";
 import NotebookIllustration from "@/components/illustrations/NotebookIllustration";
 import { buttonVariants } from "@/components/shadcn";
+import ToDos from "@/components/ToDos";
 import { H1 } from "@/components/ui/H1";
-import { useUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { ArrowUp, LogInIcon } from "lucide-react";
 import Link from "next/link";
 
-export default function Home() {
-  const { isSignedIn, user } = useUser();
-  const userId = user?.id;
+export default async function Page() {
+  const user = await currentUser();
+  const ownerId = user?.id;
 
   return (
-    <div className="p-8 flex flex-col items-center">
-      {isSignedIn && userId ? (
-        <div className="w-full flex flex-col gap-5 md:flex-row md:justify-between">
-          <H1>Keeping up with your to dos!</H1>
-          <CreateToDoForm userId={userId} />
-        </div>
+    <section className="p-8 flex flex-col items-center">
+      {ownerId ? (
+        <>
+          <div className="w-full flex flex-col gap-5 md:flex-row md:justify-between">
+            <H1>Keeping up with your to dos!</H1>
+            <CreateToDoForm userId={ownerId} />
+          </div>
+          <ToDos ownerId={ownerId} />
+        </>
       ) : (
         <div className="w-full max-w-[480px] flex flex-col items-center gap-8 md:gap-16">
           <H1>Keeping up with your to dos!</H1>
@@ -50,6 +52,6 @@ export default function Home() {
           <NotebookIllustration />
         </div>
       )}
-    </div>
+    </section>
   );
 }

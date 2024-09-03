@@ -22,7 +22,7 @@ import { LogInValues, LogInValuesSchema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PasswordFormField } from "@/components/PasswordFormField";
 
-export default function SignInForm() {
+export default function Page() {
   const { isLoaded, signIn, setActive } = useSignIn();
   const [passwordSubmitError, setPasswordSubmitError] = React.useState("");
   const router = useRouter();
@@ -93,7 +93,7 @@ export default function SignInForm() {
 
   // Display a form to capture the user's email and password
   return (
-    <div className="w-full flex justify-center pt-5 md:pt-8">
+    <section className="w-full flex justify-center pt-5 md:pt-8">
       <Card>
         <H1>Log in</H1>
         <Form {...form}>
@@ -139,6 +139,6 @@ export default function SignInForm() {
           </form>
         </Form>
       </Card>
-    </div>
+    </section>
   );
 }
